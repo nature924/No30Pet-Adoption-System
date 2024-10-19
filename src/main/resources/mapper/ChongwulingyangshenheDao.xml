@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ChongwulingyangshenheDao">
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.chongwulingyang_id as chongwulingyangId
+        ,a.yonghu_id as yonghuId
+        ,a.chongwurenlingshenhe_text as chongwurenlingshenheText
+        ,a.chongwulingyangshenhe_yesno_types as chongwulingyangshenheYesnoTypes
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ChongwulingyangshenheView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,chongwulingyang.chongwulingyang_name as chongwulingyangName
+        ,chongwulingyang.chongwulingyang_types as chongwulingyangTypes
+        ,chongwulingyang.chongwulingyang_photo as chongwulingyangPhoto
+        ,chongwulingyang.jieshu_types as jieshuTypes
+        ,chongwulingyang.chongwulingyang_content as chongwulingyangContent
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_address as yonghuAddress
+        ,yonghu.yonghu_photo as yonghuPhoto
+
+        FROM chongwulingyangshenhe  a
+        left JOIN chongwulingyang chongwulingyang ON a.chongwulingyang_id = chongwulingyang.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.chongwulingyangId != null and params.chongwulingyangId != ''">
+                and a.chongwulingyang_id = #{params.chongwulingyangId}
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and a.yonghu_id = #{params.yonghuId}
+            </if>
+            <if test=" params.chongwurenlingshenheText != '' and params.chongwurenlingshenheText != null and params.chongwurenlingshenheText != 'null' ">
+                and a.chongwurenlingshenhe_text like CONCAT('%',#{params.chongwurenlingshenheText},'%')
+            </if>
+            <if test="params.chongwulingyangshenheYesnoTypes != null and params.chongwulingyangshenheYesnoTypes != ''">
+                and a.chongwulingyangshenhe_yesno_types = #{params.chongwulingyangshenheYesnoTypes}
+            </if>
+
+                <!-- 判断宠物领养的id不为空 -->
+            <if test=" params.chongwulingyangIdNotNull != '' and params.chongwulingyangIdNotNull != null and params.chongwulingyangIdNotNull != 'null' ">
+                and a.chongwulingyang_id IS NOT NULL
+            </if>
+            <if test=" params.chongwulingyangName != '' and params.chongwulingyangName != null and params.chongwulingyangName != 'null' ">
+                and chongwulingyang.chongwulingyang_name like CONCAT('%',#{params.chongwulingyangName},'%')
+            </if>
+            <if test="params.chongwulingyangTypes != null  and params.chongwulingyangTypes != ''">
+                and chongwulingyang.chongwulingyang_types = #{params.chongwulingyangTypes}
+            </if>
+
+            <if test="params.jieshuTypes != null  and params.jieshuTypes != ''">
+                and chongwulingyang.jieshu_types = #{params.jieshuTypes}
+            </if>
+
+            <if test=" params.chongwulingyangContent != '' and params.chongwulingyangContent != null and params.chongwulingyangContent != 'null' ">
+                and chongwulingyang.chongwulingyang_content like CONCAT('%',#{params.chongwulingyangContent},'%')
+            </if>
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuAddress != '' and params.yonghuAddress != null and params.yonghuAddress != 'null' ">
+                and yonghu.yonghu_address like CONCAT('%',#{params.yonghuAddress},'%')
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
